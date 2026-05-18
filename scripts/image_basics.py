@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import importlib
 import os
 import sys
 import time
@@ -177,13 +178,14 @@ def load_yolo_model(model_name: str):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     try:
-        from ultralytics import YOLO
-    except ImportError as exc:
+        ultralytics_module = importlib.import_module("ultralytics")
+        yolo_class = getattr(ultralytics_module, "YOLO")
+    except (ImportError, AttributeError) as exc:
         raise RuntimeError(
             "YOLOv8 is not installed. Install it with: python -m pip install ultralytics"
         ) from exc
 
-    return YOLO(model_name)
+    return yolo_class(model_name)
 
 
 def run_webcam_detection(camera: int, model_name: str, width: int, confidence: float) -> None:
@@ -224,13 +226,14 @@ def run_webcam_detection(camera: int, model_name: str, width: int, confidence: f
 
         # Draw bounding boxes for all detected objects
         for result in results:
-            for detection in result.boxes:
-                detections += 1
-                class_id = int(detection.cls[0])
-                label = model.names[class_id]
-                score = float(detection.conf[0])
-                box = detection.xyxy[0].tolist()
-                draw_detection(frame, box, label, score)
+            if result.boxes is not None:
+                for detection in result.boxes:
+                    detections += 1
+                    class_id = int(detection.cls[0])
+                    label = model.names[class_id]
+                    score = float(detection.conf[0])
+                    box = detection.xyxy[0].tolist()
+                    draw_detection(frame, box, label, score)
 
         # Calculate and display FPS
         now = time.perf_counter()

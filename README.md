@@ -177,6 +177,25 @@ python scripts/image_basics.py --webcam --conf 0.5
 ./run.sh --webcam --camera 0 --conf 0.4
 ```
 
+### Motion Detection Extension
+
+This project also includes a frame-differencing motion detection demo and preprocessing
+experiments for understanding images as arrays:
+
+```bash
+# Save grayscale, crop, blur, threshold, Canny, noise, and lighting outputs
+python scripts/motion_detection.py --image images/sample.jpg --no-display
+
+# Run live webcam motion detection
+python scripts/motion_detection.py --webcam
+
+# Tune sensitivity for noisy or flickering lighting
+python scripts/motion_detection.py --webcam --threshold 35 --min-area 1500
+```
+
+Use the generated files in `outputs/motion/` and the tuning flags above as the
+discussion material for experiments, false positives, and improvements.
+
 ## 🔄 Workflow
 
 ### Image Processing Workflow
