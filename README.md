@@ -1,6 +1,6 @@
-# OpenCV YOLOv8 Detection System
+# MotionGuard
 
-A comprehensive Python project for image processing and real-time object detection using OpenCV and YOLOv8. Process images with resizing and grayscale conversion, or run live object detection on webcam feeds.
+MotionGuard is a Python computer vision project for image processing, real-time YOLOv8 object detection, and webcam-based motion detection using OpenCV.
 
 ## 🎯 Features
 
@@ -13,7 +13,7 @@ A comprehensive Python project for image processing and real-time object detecti
 ## 📋 Project Structure
 
 ```
-opencv-yolo-project/
+motionguard/
 ├── scripts/
 │   ├── image_basics.py          # Image processing and YOLOv8 object detection
 │   └── motion_detection.py       # Motion detection and preprocessing experiments
@@ -44,8 +44,8 @@ opencv-yolo-project/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/opencv-yolo-detection.git
-   cd opencv-yolo-detection
+   git clone https://github.com/Akashhh-p/motionguard.git
+   cd motionguard
    ```
 
 2. **Install dependencies**
