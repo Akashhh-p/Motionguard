@@ -87,6 +87,8 @@ Also add your custom domain later if you connect one.
 
 ## Fix For Your Current Error
 
+If Render logs show `Timed Out` after `No open ports detected`, redeploy the latest commit. The backend no longer loads YOLO during FastAPI startup, so Render can detect the web port quickly. YOLO loads lazily when you use detection features.
+
 If Render logs show `ModuleNotFoundError: No module named 'app'`, your backend service is starting from the repo root with `uvicorn app.main:app`. Use:
 
 ```text

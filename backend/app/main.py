@@ -6,7 +6,6 @@ from .config import get_settings
 from .database import init_db
 from .middleware import RateLimitMiddleware
 from .routes import analytics_routes, assistant_routes, auth_routes, dashboard_routes, detection_routes, evidence_routes, file_routes, motion_routes, report_routes, settings_routes, system_routes, zone_routes
-from .services.yolo_service import get_yolo_model
 
 
 settings = get_settings()
@@ -29,10 +28,6 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     init_db()
-    try:
-        get_yolo_model()
-    except Exception as exc:
-        logging.getLogger(__name__).error("YOLO model failed during startup: %s", exc)
 
 
 @app.get("/health")
