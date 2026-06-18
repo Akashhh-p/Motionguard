@@ -57,6 +57,10 @@ Thumbs.db
 .coverage
 htmlcov/
 
+# Build and runtime artifacts
+*.log
+*.tsbuildinfo
+
 # Virtual environments
 .venv
 venv/
@@ -65,3 +69,17 @@ ENV/
 # Environment variables
 .env
 .env.local
+*serviceAccount*.json
+firebase-adminsdk*.json
+firebase-service-account*.json
+
+# MotionGuard AI Enterprise runtime data
+backend/motionguard.db
+backend/user_data/
+backend/storage/
+backend/logs/
+backend/uploads/
+backend/evidence/
+backend/reports/
+frontend/node_modules/
+frontend/dist/

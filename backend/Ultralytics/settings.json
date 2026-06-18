@@ -1,6 +1,6 @@
 {
   "settings_version": "0.0.6",
-  "datasets_dir": "C:\\Users\\akash\\OneDrive\\Desktop\\opencv-yolo-project\\datasets",
+  "datasets_dir": "C:\\projects\\Motionguard\\backend\\datasets",
   "weights_dir": "weights",
   "runs_dir": "runs",
   "uuid": "0a7d3e1f67d0b5e8acdb7b654ec903e99b1e4af5bfed6a637012491bfb37deb5",
