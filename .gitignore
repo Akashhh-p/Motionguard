@@ -69,6 +69,8 @@ ENV/
 # Environment variables
 .env
 .env.local
+.env.production
+secrets/
 *serviceAccount*.json
 firebase-adminsdk*.json
 firebase-service-account*.json
