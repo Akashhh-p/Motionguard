@@ -14,18 +14,18 @@ Recommended backend settings:
 
 ```text
 Name: motionguard-backend
-Root Directory: backend
 Runtime: Python 3
-Build Command: pip install -r requirements.txt
-Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Root Directory: leave blank
+Build Command: pip install -r backend/requirements.txt
+Start Command: python render_start.py
 Health Check Path: /health
 ```
 
-If you do not use `Root Directory: backend`, use these commands instead:
+Alternative settings if you set `Root Directory` to `backend`:
 
 ```text
-Build Command: pip install -r backend/requirements.txt
-Start Command: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
 
 ## Backend Environment
@@ -87,7 +87,14 @@ Also add your custom domain later if you connect one.
 
 ## Fix For Your Current Error
 
-Your deploy log shows Render is using a Python version where `torch==2.1.1` is unavailable. Fix it by setting this backend environment variable and redeploying:
+If Render logs show `ModuleNotFoundError: No module named 'app'`, your backend service is starting from the repo root with `uvicorn app.main:app`. Use:
+
+```text
+Build Command: pip install -r backend/requirements.txt
+Start Command: python render_start.py
+```
+
+If Render logs show `torch==2.1.1` is unavailable, set this backend environment variable and redeploy:
 
 ```text
 PYTHON_VERSION=3.11.11
