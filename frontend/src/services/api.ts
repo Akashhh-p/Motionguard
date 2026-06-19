@@ -1,8 +1,19 @@
 import axios from "axios";
 import { getFirebaseIdToken } from "./firebase";
 
+function apiBaseURL() {
+  const configured = import.meta.env.DEV ? "/api" : import.meta.env.VITE_API_URL || "/api";
+  const trimmed = configured.replace(/\/+$/, "");
+
+  if (trimmed.endsWith("/api")) {
+    return trimmed;
+  }
+
+  return `${trimmed}/api`;
+}
+
 export const api = axios.create({
-  baseURL: import.meta.env.DEV ? "/api" : import.meta.env.VITE_API_URL || "/api"
+  baseURL: apiBaseURL()
 });
 
 api.interceptors.request.use(async (config) => {

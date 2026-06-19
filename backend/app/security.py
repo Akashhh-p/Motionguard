@@ -1,4 +1,5 @@
 from functools import lru_cache
+import json
 from pathlib import Path
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -23,14 +24,21 @@ def get_firebase_app():
     except ValueError:
         pass
 
-    if not settings.firebase_service_account_path:
-        raise HTTPException(status_code=500, detail="Firebase Admin service account is not configured.")
+    if settings.firebase_service_account_json:
+        try:
+            service_account_info = json.loads(settings.firebase_service_account_json)
+            credential = credentials.Certificate(service_account_info)
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail="Firebase Admin service account JSON is invalid.") from exc
+    else:
+        if not settings.firebase_service_account_path:
+            raise HTTPException(status_code=500, detail="Firebase Admin service account is not configured.")
 
-    service_account = Path(settings.firebase_service_account_path)
-    if not service_account.exists():
-        raise HTTPException(status_code=500, detail="Firebase Admin service account file was not found.")
+        service_account = Path(settings.firebase_service_account_path)
+        if not service_account.exists():
+            raise HTTPException(status_code=500, detail="Firebase Admin service account file was not found.")
 
-    credential = credentials.Certificate(str(service_account))
+        credential = credentials.Certificate(str(service_account))
     options = {"projectId": settings.firebase_project_id} if settings.firebase_project_id else None
     return initialize_app(credential, options=options)
 

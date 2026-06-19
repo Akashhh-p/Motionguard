@@ -50,6 +50,14 @@ Contents: your Firebase Admin SDK service account JSON
 
 Render exposes secret files at `/etc/secrets/<filename>`.
 
+Alternatively, if secret files are awkward, add one environment variable instead:
+
+```text
+FIREBASE_SERVICE_ACCOUNT_JSON=<paste the full Firebase Admin SDK JSON on one line>
+```
+
+Use either `FIREBASE_SERVICE_ACCOUNT_PATH` with a Render secret file or `FIREBASE_SERVICE_ACCOUNT_JSON`. The JSON env var takes precedence when both are set.
+
 ## Frontend Static Site
 
 Create a new **Static Site** on Render from the same repo.
@@ -97,6 +105,8 @@ Start Command: python render_start.py
 ```
 
 The repo also includes a root-level compatibility module, so `uvicorn app.main:app --host 0.0.0.0 --port $PORT` works from the repo root after this commit. `python render_start.py` is still the preferred Render start command because it is explicit.
+
+If Render logs show `POST /auth/session HTTP/1.1" 404 Not Found`, the frontend was built with an API URL that missed the `/api` prefix. Set `VITE_API_URL=https://your-backend-service.onrender.com/api` and redeploy the frontend. The frontend also normalizes a backend root URL to `/api` as a guardrail.
 
 If Render logs show `torch==2.1.1` is unavailable, set this backend environment variable and redeploy:
 

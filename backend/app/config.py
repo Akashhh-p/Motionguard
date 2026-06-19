@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 1440
     google_client_id: str = ""
     firebase_service_account_path: str = ""
+    firebase_service_account_json: str = ""
     firebase_project_id: str = ""
     frontend_url: str = "http://127.0.0.1:5173"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
