@@ -65,6 +65,7 @@ export function EvidencePage() {
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<number | null>(null);
   const busyRef = useRef(false);
+  const liveRunningRef = useRef(false);
   const [liveRunning, setLiveRunning] = useState(false);
   const [liveResult, setLiveResult] = useState<LiveObjectResult | null>(null);
   const [debugMode, setDebugMode] = useState(false);
@@ -264,22 +265,25 @@ export function EvidencePage() {
   }
 
   async function startLiveObjectDetection() {
+    stopLiveObjectDetection();
     clearPreview();
     setSelected(null);
     setUpload(null);
     setAnalysis(null);
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 960, height: 540 }, audio: false });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 360 }, audio: false });
     streamRef.current = stream;
     if (videoRef.current) {
       videoRef.current.srcObject = stream;
       await videoRef.current.play();
     }
+    liveRunningRef.current = true;
     setLiveRunning(true);
-    timerRef.current = window.setInterval(() => detectLiveFrame(), 650);
+    detectLiveFrame();
   }
 
   function stopLiveObjectDetection() {
-    if (timerRef.current) window.clearInterval(timerRef.current);
+    liveRunningRef.current = false;
+    if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = null;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
@@ -289,20 +293,25 @@ export function EvidencePage() {
   async function detectLiveFrame() {
     const video = videoRef.current;
     const capture = captureRef.current;
-    if (!video || !capture || busyRef.current || video.readyState < 2) return;
+    if (!liveRunningRef.current || !video || !capture || busyRef.current || video.readyState < 2) {
+      if (liveRunningRef.current) timerRef.current = window.setTimeout(() => detectLiveFrame(), 300);
+      return;
+    }
     busyRef.current = true;
     try {
       const requestStarted = performance.now();
-      const width = video.videoWidth || 960;
-      const height = video.videoHeight || 540;
+      const sourceWidth = video.videoWidth || 640;
+      const sourceHeight = video.videoHeight || 360;
+      const width = Math.min(sourceWidth, 640);
+      const height = Math.max(1, Math.round(sourceHeight * (width / sourceWidth)));
       capture.width = width;
       capture.height = height;
       const ctx = capture.getContext("2d");
       if (!ctx) return;
       ctx.drawImage(video, 0, 0, width, height);
-      const image = capture.toDataURL("image/jpeg", 0.78);
+      const image = capture.toDataURL("image/jpeg", 0.65);
       setFrameSentCount((count) => count + 1);
-      const { data } = await api.post<LiveObjectResult>("/evidence/object-detect-frame", { image, confidence });
+      const { data } = await api.post<LiveObjectResult>("/evidence/object-detect-frame", { image, confidence }, { timeout: 8000 });
       setLastResponseMs(Math.round(performance.now() - requestStarted));
       setBackendConnected(Boolean(data.success));
       setLastError("");
@@ -314,6 +323,9 @@ export function EvidencePage() {
       setMessage(error);
     } finally {
       busyRef.current = false;
+      if (liveRunningRef.current) {
+        timerRef.current = window.setTimeout(() => detectLiveFrame(), 900);
+      }
     }
   }
 

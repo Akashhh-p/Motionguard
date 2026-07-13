@@ -1,6 +1,5 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
-import { login as loginApi, logout as logoutApi, me, signup as signupApi, googleLogin, syncSession, User } from "../services/authService";
-import { observeFirebaseAuth } from "../services/firebase";
+import { createContext, ReactNode, useContext, useMemo } from "react";
+import { User } from "../services/authService";
 
 
 type AuthContextValue = {
@@ -15,44 +14,26 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const localUser: User = {
+  id: 1,
+  full_name: "MotionGuard Operator",
+  email: "operator@motionguard.local",
+  auth_provider: "local",
+  role: "Operator",
+  email_verified: true
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const raw = localStorage.getItem("motionguard_user");
-    return raw ? JSON.parse(raw) : null;
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = observeFirebaseAuth((firebaseUser) => {
-      if (!firebaseUser) {
-        localStorage.removeItem("motionguard_user");
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-      me()
-        .then(setUser)
-        .catch(() => syncSession().then(setUser).catch(() => setUser(null)))
-        .finally(() => setLoading(false));
-    });
-    return unsubscribe;
-  }, []);
-
   const value = useMemo<AuthContextValue>(
     () => ({
-      user,
-      loading,
-      login: async (email, password) => setUser(await loginApi(email, password)),
-      signup: async (name, email, password) => setUser(await signupApi(name, email, password)),
-      continueWithGoogle: async () => setUser(await googleLogin()),
-      logout: async () => {
-        await logoutApi();
-        setUser(null);
-        window.location.href = "/login";
-      }
+      user: localUser,
+      loading: false,
+      login: async () => undefined,
+      signup: async () => undefined,
+      continueWithGoogle: async () => undefined,
+      logout: async () => undefined
     }),
-    [user, loading]
+    []
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

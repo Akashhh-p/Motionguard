@@ -1,0 +1,15 @@
+path: C:/projects/Motionguard/backend/training/data/motionguard
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: person
+  1: car
+  2: truck
+  3: bus
+  4: motorcycle
+  5: bicycle
+  6: backpack
+  7: handbag
+  8: suitcase

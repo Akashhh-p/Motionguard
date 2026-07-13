@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getFirebaseIdToken } from "./firebase";
 
 function apiBaseURL() {
   const configured = import.meta.env.DEV ? "/api" : import.meta.env.VITE_API_URL || "/api";
@@ -16,21 +15,9 @@ export const api = axios.create({
   baseURL: apiBaseURL()
 });
 
-api.interceptors.request.use(async (config) => {
-  const token = await getFirebaseIdToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("motionguard_user");
-      if (!window.location.pathname.includes("/login")) window.location.href = "/login";
-    }
     return Promise.reject(error);
   }
 );

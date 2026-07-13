@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { LogOut, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 
 export function SettingsPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [settings, setSettings] = useState<any | null>(null);
   const [saved, setSaved] = useState(false);
   useEffect(() => { api.get("/settings").then((res) => setSettings(res.data)); }, []);
@@ -20,16 +20,15 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div><h1 className="text-2xl font-bold text-ink">Settings</h1><p className="text-sm text-muted">Account, detection, alert, and evidence preferences.</p></div>
+      <div><h1 className="text-2xl font-bold text-ink">Settings</h1><p className="text-sm text-muted">Detection, alert, and evidence preferences.</p></div>
       <div className="grid gap-4 lg:grid-cols-[.8fr_1.2fr]">
         <Card>
           <h2 className="font-bold text-ink">Account</h2>
           <div className="mt-4 space-y-2 text-sm text-muted">
             <p>Name: <b>{user?.full_name}</b></p>
             <p>Email: <b>{user?.email}</b></p>
-            <p>Provider: <b>{user?.auth_provider}</b></p>
+            <p>Mode: <b>{user?.auth_provider}</b></p>
           </div>
-          <Button onClick={logout} className="mt-5 bg-[#DC2626] hover:bg-[#B91C1C]"><LogOut size={18} /> Logout</Button>
         </Card>
         <Card>
           <h2 className="font-bold text-ink">Detection engine</h2>

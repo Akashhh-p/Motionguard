@@ -2,7 +2,6 @@ from functools import lru_cache
 import json
 from pathlib import Path
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 from firebase_admin import auth as firebase_auth
 from firebase_admin import credentials, get_app, initialize_app
 from sqlalchemy.orm import Session
@@ -11,9 +10,6 @@ from .database import get_db
 from .models import User
 from .services.settings_service import get_or_create_settings
 from .utils.time_utils import utc_now
-
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/session")
 
 
 @lru_cache(maxsize=1)
@@ -102,6 +98,24 @@ def sync_user_from_claims(db: Session, claims: dict) -> User:
     return user
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
-    claims = verify_firebase_token(token)
-    return sync_user_from_claims(db, claims)
+def get_current_user(db: Session = Depends(get_db)) -> User:
+    user = db.query(User).filter(User.email == "operator@motionguard.local").first()
+    if not user:
+        user = User(
+            firebase_uid="local-motionguard-operator",
+            full_name="MotionGuard Operator",
+            email="operator@motionguard.local",
+            auth_provider="local",
+            email_verified=True,
+            last_login=utc_now(),
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    else:
+        user.last_login = utc_now()
+        db.commit()
+        db.refresh(user)
+
+    get_or_create_settings(db, user)
+    return user

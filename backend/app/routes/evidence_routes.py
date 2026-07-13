@@ -10,7 +10,7 @@ from ..database import get_db
 from ..models import Detection, Evidence, EvidenceDetection, User
 from ..security import get_current_user
 from ..services.audit_service import audit
-from ..services.yolo_service import detect_frame
+from ..services.yolo_service import detect_frame, resize_to_width
 from ..utils.file_utils import assert_storage_file
 from ..utils.file_utils import sanitize_filename
 from ..config import get_settings
@@ -168,6 +168,7 @@ async def object_detect(
 def object_detect_frame(payload: ObjectDetectFrameRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     started = time.perf_counter()
     frame = decode_base64_frame(payload.image)
+    frame = resize_to_width(frame, get_settings().default_frame_width)
     height, width = frame.shape[:2]
     inference_started = time.perf_counter()
     detections = detect_frame(frame, confidence=payload.confidence, allowed_classes=None)

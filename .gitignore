@@ -81,5 +81,10 @@ backend/logs/
 backend/uploads/
 backend/evidence/
 backend/reports/
+backend/training/data/
+backend/training/runs/
+motionguard_datasets/
+motionguard_datasets.zip
+Ultralytics/
 frontend/node_modules/
 frontend/dist/

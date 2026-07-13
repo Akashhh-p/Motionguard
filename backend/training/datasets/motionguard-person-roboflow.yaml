@@ -1,0 +1,12 @@
+# YOLO dataset config for the MotionGuard person-detection Roboflow export.
+#
+# Source folder:
+# C:/projects/Motionguard/motionguard_datasets
+
+path: C:/projects/Motionguard/motionguard_datasets
+train: train/images
+val: valid/images
+test: test/images
+
+names:
+  0: person

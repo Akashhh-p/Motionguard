@@ -24,8 +24,10 @@ function authError(error: any): Error {
     "auth/wrong-password": "Incorrect password.",
     "auth/invalid-credential": "Invalid email or password.",
     "auth/popup-closed-by-user": "Google sign-in was closed before completion.",
+    "auth/cancelled-popup-request": "Google sign-in popup was cancelled. Please try again.",
     "auth/network-request-failed": "Network error. Check your connection.",
-    "auth/configuration-not-found": "Firebase authentication is not configured for this project."
+    "auth/configuration-not-found": "Firebase authentication is not configured for this project.",
+    "auth/operation-not-supported-in-this-environment": "Popups are blocked in your browser. Please enable popups for this site."
   };
   return new Error(messages[code] || error?.message || "Authentication failed.");
 }

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Camera, FileText, ShieldCheck, Sparkles } from "lucide-react";
+import { ThreeSecurityScene } from "../components/ThreeSecurityScene";
 
 export function LandingPage() {
   return (
@@ -12,16 +13,12 @@ export function LandingPage() {
             <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">A production-style surveillance analytics platform for teams that need uploaded video analysis, webcam monitoring, restricted zones, evidence, reports, and accountable multi-user data isolation.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/dashboard" className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-bold text-white shadow-premium transition hover:-translate-y-0.5 hover:bg-[#4F5B42]">Open Dashboard <ArrowRight size={18} /></Link>
-              <Link to="/login" className="inline-flex min-h-11 items-center rounded-2xl border border-[#E5E7E1] bg-[#F7F8F4] px-5 py-3 text-sm font-bold text-ink transition hover:bg-[#EFF2EC]">Sign in</Link>
             </div>
           </div>
           <div className="grid content-end">
-            <div className="rounded-[24px] border border-[#E5E7E1] bg-[#FFFFFF] p-4 shadow-premium">
-              <div className="aspect-video rounded-[24px] bg-[#EFF2EC] p-4">
-                <div className="h-full rounded-[20px] border border-[#E5E7E1] bg-[#F7F8F4] p-4">
-                  <div className="mb-3 flex items-center justify-between text-sm font-semibold"><span>Camera Cluster 04</span><span className="text-teal">Live</span></div>
-                  <div className="grid h-[78%] place-items-center rounded-lg border border-dashed border-[#E5E7E1] bg-[#EFF2EC] text-muted">Detection overlays, zones, and alerts render inside the console</div>
-                </div>
+            <div className="overflow-hidden rounded-[24px] border border-[#E5E7E1] bg-[#FFFFFF] p-4 shadow-premium">
+              <div className="aspect-video overflow-hidden rounded-[22px] border border-[#E5E7E1] bg-[#EFF2EC]">
+                <ThreeSecurityScene />
               </div>
             </div>
           </div>

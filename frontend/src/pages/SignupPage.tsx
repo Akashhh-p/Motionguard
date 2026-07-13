@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { useAuth } from "../context/AuthContext";
@@ -15,6 +15,8 @@ export function SignupPage() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const googleLoadingRef = useRef(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -39,6 +41,22 @@ export function SignupPage() {
     }
   }
 
+  async function handleGoogleAuth() {
+    if (googleLoadingRef.current) return;
+    googleLoadingRef.current = true;
+    setGoogleLoading(true);
+    setError("");
+    try {
+      await continueWithGoogle();
+      navigate("/dashboard");
+    } catch (exc: any) {
+      setError(exc.message || "Google sign-in failed.");
+    } finally {
+      googleLoadingRef.current = false;
+      setGoogleLoading(false);
+    }
+  }
+
   return (
     <AuthShell title="Create account" subtitle="Start with an empty, private workspace.">
       <form onSubmit={submit} className="space-y-4">
@@ -49,7 +67,7 @@ export function SignupPage() {
         {error && <p className="rounded-2xl bg-[#FEF2F2] px-3 py-2 text-sm text-[#DC2626]">{error}</p>}
         <Button disabled={loading} className="w-full">{loading ? "Creating..." : "Signup"}</Button>
       </form>
-      <GoogleAuthButton onClick={() => continueWithGoogle().then(() => navigate("/dashboard")).catch((exc) => setError(exc.message || "Google sign-in failed."))} loading={loading} />
+      <GoogleAuthButton onClick={handleGoogleAuth} loading={googleLoading} />
       <p className="mt-5 text-center text-sm text-muted">Already registered? <Link className="font-semibold text-brand" to="/login">Login</Link></p>
     </AuthShell>
   );
