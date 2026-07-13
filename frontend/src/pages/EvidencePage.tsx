@@ -48,6 +48,10 @@ type Toast = {
   text: string;
 } | null;
 
+const LIVE_FRAME_MAX_WIDTH = 512;
+const LIVE_DETECTION_TIMEOUT_MS = 30000;
+const LIVE_DETECTION_DELAY_MS = 1000;
+const LIVE_DETECTION_ERROR_DELAY_MS = 2500;
 
 export function EvidencePage() {
   const [items, setItems] = useState<EvidenceItem[]>([]);
@@ -270,7 +274,7 @@ export function EvidencePage() {
     setSelected(null);
     setUpload(null);
     setAnalysis(null);
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 360 }, audio: false });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: LIVE_FRAME_MAX_WIDTH, height: 288 }, audio: false });
     streamRef.current = stream;
     if (videoRef.current) {
       videoRef.current.srcObject = stream;
@@ -298,11 +302,12 @@ export function EvidencePage() {
       return;
     }
     busyRef.current = true;
+    let hadError = false;
     try {
       const requestStarted = performance.now();
-      const sourceWidth = video.videoWidth || 640;
-      const sourceHeight = video.videoHeight || 360;
-      const width = Math.min(sourceWidth, 640);
+      const sourceWidth = video.videoWidth || LIVE_FRAME_MAX_WIDTH;
+      const sourceHeight = video.videoHeight || 288;
+      const width = Math.min(sourceWidth, LIVE_FRAME_MAX_WIDTH);
       const height = Math.max(1, Math.round(sourceHeight * (width / sourceWidth)));
       capture.width = width;
       capture.height = height;
@@ -311,20 +316,28 @@ export function EvidencePage() {
       ctx.drawImage(video, 0, 0, width, height);
       const image = capture.toDataURL("image/jpeg", 0.65);
       setFrameSentCount((count) => count + 1);
-      const { data } = await api.post<LiveObjectResult>("/evidence/object-detect-frame", { image, confidence }, { timeout: 8000 });
+      const { data } = await api.post<LiveObjectResult>(
+        "/evidence/object-detect-frame",
+        { image, confidence },
+        { timeout: LIVE_DETECTION_TIMEOUT_MS },
+      );
       setLastResponseMs(Math.round(performance.now() - requestStarted));
       setBackendConnected(Boolean(data.success));
       setLastError("");
       setLiveResult(data);
     } catch (exc: any) {
-      const error = exc.response?.data?.detail || exc.message || "Live object detection failed.";
+      hadError = true;
+      const error = exc.code === "ECONNABORTED"
+        ? "Live detection is still warming up. Retrying..."
+        : exc.response?.data?.detail || exc.message || "Live object detection failed.";
       setLastError(error);
       setBackendConnected(false);
       setMessage(error);
     } finally {
       busyRef.current = false;
       if (liveRunningRef.current) {
-        timerRef.current = window.setTimeout(() => detectLiveFrame(), 900);
+        const retryDelay = hadError ? LIVE_DETECTION_ERROR_DELAY_MS : LIVE_DETECTION_DELAY_MS;
+        timerRef.current = window.setTimeout(() => detectLiveFrame(), retryDelay);
       }
     }
   }
